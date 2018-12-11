@@ -200,7 +200,8 @@ function findTimestamp(incomingStr)
         if(hasDate)
         {
             timestamp = dateOfHasDate + addToTimestamp;
-            timestamp -= 1000 * 60 * 60 * 5;
+         //Convert to eastern from coordinated universal   
+         timestamp += 1000 * 60 * 60 * 5;
             console.log("Date and adding: " + timestamp);
         }
         return timestamp;
