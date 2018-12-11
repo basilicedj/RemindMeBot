@@ -200,7 +200,7 @@ function findTimestamp(incomingStr)
         if(hasDate)
         {
             timestamp = dateOfHasDate + addToTimestamp;
-            timestamp -= 1000 * 60 * 5;
+            timestamp -= 1000 * 60 * 60 * 5;
             console.log("Date and adding: " + timestamp);
         }
         return timestamp;
