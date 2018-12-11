@@ -244,7 +244,10 @@ function remindFriendStart(incomingMessage, mentions, attachment)
         var split = messageLowerCase.split("remind me: ");
         var timeStyle = split[1].split("@@")[0];
         var info = incomingMessage.split("@@")[1];
-        info += "\nATTCH" + attachment;
+        if(attachment.length > 0)
+        {
+             info += "\nATTCH" + attachment;
+        }
         var localLength = localStorage.length;
         var timestamp = findTimestamp(timeStyle)  
         var userTags = "";
