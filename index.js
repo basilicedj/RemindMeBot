@@ -1,5 +1,8 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+//428950203144470528 General
+//521434157193232392 Bot Testing
+var messageChannel = '428950203144470528';
 var LocalStorage = require('node-localstorage').LocalStorage,
 localStorage = new LocalStorage('./scratch');
 
@@ -15,9 +18,22 @@ client.on('ready', () => {
  var startUp = setTimeout(startUpBot, 5000);
  function startUpBot()
  {
-    var channel = client.channels.get('428950203144470528');
+    var channel = client.channels.get(messageChannel);
     channel.send("Remind me bot is up and running poi~");
     var intervalID = setInterval(checkTimes, 500);
+ }
+
+ function processAttachment(attachmentCollection)
+ {
+    var attachment = attachmentCollection.first();
+    if(attachment != null)
+    {
+        console.log("Has Attachment");
+        var channel = client.channels.get(messageChannel);
+        //channel.send(attachment.url);
+        return attachment.url;
+    }
+    return "";
  }
 
 //Check the time for each entry in storage
@@ -35,10 +51,7 @@ function checkTimes() {
             {
                 console.log(timeStamp + ":" + Date.now())
                 //Do the reminder
-                //428950203144470528 General
-                //521434157193232392 Bot Testing
-                var channel = client.channels.get('428950203144470528');
-                //console.log(channel);
+                var channel = client.channels.get(messageChannel);
                 channel.send(dateInfo);
                 localStorage.removeItem(localStorage.key(i));
                 return;
@@ -50,9 +63,6 @@ function checkTimes() {
 
 //If you get a message
 client.on('message', msg => {
-
-    console.log(msg.author.tag + ":" + client.user.tag);
-
     //If the message author is not this bot
     if(msg.author.tag != client.user.tag)
     {
@@ -60,6 +70,8 @@ client.on('message', msg => {
         {
             msg.reply('pong');
         }
+
+        var attachment = processAttachment(msg.attachments);
 
         //If the bot is tagged in the message
         if(msg.mentions.users.get(client.user.id) != null)
@@ -81,11 +93,11 @@ client.on('message', msg => {
                 msg.reply(respond);
             }
             else if (incomingMessage.includes("remind me:")) {
-                var respond = remindMeStart(msg.content, msg.author.id);
+                var respond = remindMeStart(msg.content, msg.author.id, attachment);
                 msg.reply(respond);
             }
             else if(incomingMessage.includes("remind")) {
-                   var respond = remindFriendStart(msg.content, msg.mentions.users);
+                   var respond = remindFriendStart(msg.content, msg.mentions.users, attachment);
                    msg.reply(respond);
             }
         }
@@ -119,7 +131,9 @@ function listReminders()
         {
             console.log("TIMESTAMP IN STORAGE: " + inStorage.split("@@%^$@%&")[0])
             date = new Date(inStorage.split("@@%^$@%&")[0] - 0);
-            response += "\n" + (i+1) + ": " + date.toString() + ": " + inStorage.split("@@%^$@%&")[1];
+
+            var info = inStorage.split("@@%^$@%&")[1].split("\nATTCH")[0];
+            response += "\n" + (i+1) + ": " + date.toString() + ": " + info;
         }
     }
     return response;
@@ -186,6 +200,7 @@ function findTimestamp(incomingStr)
         if(hasDate)
         {
             timestamp = dateOfHasDate + addToTimestamp;
+            timestamp -= 1000 * 60 * 5;
             console.log("Date and adding: " + timestamp);
         }
         return timestamp;
@@ -197,7 +212,7 @@ function findTimestamp(incomingStr)
 }
 
 //Taken an incoming message and the Author and returns a response
-function remindMeStart(incomingMessage, userTag)
+function remindMeStart(incomingMessage, userTag, attachment)
 {
     try{
         var messageLowerCase = incomingMessage.toLowerCase();
@@ -205,10 +220,12 @@ function remindMeStart(incomingMessage, userTag)
         var timeStyle = split[1].split("@@")[0];
         var timestamp = findTimestamp(timeStyle)        
         var info = incomingMessage.split("@@")[1];
+        info += "\nATTCH" + attachment;
+
         var localLength = localStorage.length;
 
         localStorage.setItem(localLength, "" + timestamp + "@@%^$@%&" + " <@" + userTag + "> " + info);
-        return "I will remind you\n" + info + " \nIn " + timeStyle;
+        return "I will remind you\n" + info.split("\nATTCH")[0] + " \nIn " + timeStyle;
 }
     catch(err) {
         console.log(err.message);
@@ -219,13 +236,14 @@ function remindMeStart(incomingMessage, userTag)
 
 
 
-function remindFriendStart(incomingMessage, mentions)
+function remindFriendStart(incomingMessage, mentions, attachment)
 {
     try {      
         var messageLowerCase = incomingMessage.toLowerCase();
         var split = messageLowerCase.split("remind me: ");
         var timeStyle = split[1].split("@@")[0];
         var info = incomingMessage.split("@@")[1];
+        info += "\nATTCH" + attachment;
         var localLength = localStorage.length;
         var timestamp = findTimestamp(timeStyle)  
         var userTags = "";
@@ -236,7 +254,7 @@ function remindFriendStart(incomingMessage, mentions)
 
 
         localStorage.setItem(localLength, "" + timestamp + "@@%^$@%&" + userTags + " " + info);
-        return "I will remind " + userTags + "\n" + info + "\nIn " + timeStyle;
+        return "I will remind " + userTags + "\n" + info.split("\nATTCH")[0] + "\nIn " + timeStyle;
     }
 catch(err) {
     console.log(err.message);
