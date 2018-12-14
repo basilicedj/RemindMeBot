@@ -10,7 +10,7 @@ client.on('ready', () => {
  console.log(`Logged in as ${client.user.tag}!`);
  });
 
- client.login('NTIxMTUwMDQ2OTE0MzQ3MDE5.Du4TTg.zkGgZNyTLsgyvygZMdjGri6A5c4');
+ client.login('');
 
 
 
