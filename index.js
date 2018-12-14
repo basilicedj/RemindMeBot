@@ -1,18 +1,24 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const config = require('./config.js');
+
+
 //428950203144470528 General
 //521434157193232392 Bot Testing
+
+
 var messageChannel = '428950203144470528';
 var LocalStorage = require('node-localstorage').LocalStorage,
 localStorage = new LocalStorage('./scratch');
+
+
+
 
 client.on('ready', () => {
  console.log(`Logged in as ${client.user.tag}!`);
  });
 
- client.login('');
-
-
+client.login(config.getLogon());
 
 //Start the bot
  var startUp = setTimeout(startUpBot, 5000);
