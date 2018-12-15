@@ -1,16 +1,13 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const config = require('./config.js');
-
-
+var LocalStorage = require('node-localstorage').LocalStorage,
+localStorage = new LocalStorage('./scratch');
 //428950203144470528 General
 //521434157193232392 Bot Testing
 
 
 var messageChannel = '428950203144470528';
-var LocalStorage = require('node-localstorage').LocalStorage,
-localStorage = new LocalStorage('./scratch');
-
 
 
 
@@ -18,6 +15,7 @@ client.on('ready', () => {
  console.log(`Logged in as ${client.user.tag}!`);
  });
 
+console.log(config.getLogon());
 client.login(config.getLogon());
 
 //Start the bot
@@ -99,11 +97,11 @@ client.on('message', msg => {
                 msg.reply(respond);
             }
             else if (incomingMessage.includes("remind me:")) {
-                var respond = remindMeStart(msg.content, msg.author.id, attachment);
+                var respond = remindMeStart(msg.content, msg.author.id, attachment, msg.author.username);
                 msg.reply(respond);
             }
             else if(incomingMessage.includes("remind")) {
-                   var respond = remindFriendStart(msg.content, msg.mentions.users, attachment);
+                   var respond = remindFriendStart(msg.content, msg.mentions.users, attachment, msg.author.username);
                    msg.reply(respond);
             }
         }
@@ -152,6 +150,17 @@ function findDateTimestamp(incomingString)
     date = new Date(date);
     console.log(date.getTime());
     return date.getTime();
+}
+
+function storeData(timestamp, username, userID, text)
+{
+	var dates = config.database.child("reminders");
+	dates.push({
+	"info" : text,
+	"timestamp" : timestamp,
+	"username" : username,
+	"userID": userID
+	})
 }
 
 function findTimestamp(incomingStr)
@@ -219,7 +228,7 @@ function findTimestamp(incomingStr)
 }
 
 //Taken an incoming message and the Author and returns a response
-function remindMeStart(incomingMessage, userTag, attachment)
+function remindMeStart(incomingMessage, userTag, attachment, authorName)
 {
     try{
         var messageLowerCase = incomingMessage.toLowerCase();
@@ -227,12 +236,16 @@ function remindMeStart(incomingMessage, userTag, attachment)
         var timeStyle = split[1].split("@@")[0];
         var timestamp = findTimestamp(timeStyle)        
         var info = incomingMessage.split("@@")[1];
-        info += "\nATTCH" + attachment;
+        if(attachment.length > 0)
+        {
+             info += "\nATTCH" + attachment;
+        }
 
         var localLength = localStorage.length;
 
         localStorage.setItem(localLength, "" + timestamp + "@@%^$@%&" + " <@" + userTag + "> " + info);
-        return "I will remind you\n" + info.split("\nATTCH")[0] + " \nIn " + timeStyle;
+        storeData(timestamp, authorName, " <@" + userTag + ">",  info);
+	return "I will remind you\n" + info.split("\nATTCH")[0] + " \nIn " + timeStyle;
 }
     catch(err) {
         console.log(err.message);
@@ -243,11 +256,11 @@ function remindMeStart(incomingMessage, userTag, attachment)
 
 
 
-function remindFriendStart(incomingMessage, mentions, attachment)
+function remindFriendStart(incomingMessage, mentions, attachment, authorName)
 {
     try {      
         var messageLowerCase = incomingMessage.toLowerCase();
-        var split = messageLowerCase.split("remind me: ");
+        var split = messageLowerCase.split(": ");
         var timeStyle = split[1].split("@@")[0];
         var info = incomingMessage.split("@@")[1];
         if(attachment.length > 0)
@@ -257,12 +270,17 @@ function remindFriendStart(incomingMessage, mentions, attachment)
         var localLength = localStorage.length;
         var timestamp = findTimestamp(timeStyle)  
         var userTags = "";
-
+	var userNames = "";
         mentions.forEach(element => {
-            userTags += "<@" + element.id + ">" + " "
-        });
+	    if(element.id != client.user.id)
+	    {
+            	userTags += "<@" + element.id + ">" + " ";
+            	userNames += element.username;
+            }
+	});
 
 
+        storeData(timestamp, authorName, userNames,  info);
         localStorage.setItem(localLength, "" + timestamp + "@@%^$@%&" + userTags + " " + info);
         return "I will remind " + userTags + "\n" + info.split("\nATTCH")[0] + "\nIn " + timeStyle;
     }
