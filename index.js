@@ -64,12 +64,36 @@ function checkTimes() {
     }
 }
 
+function editMessageAutism(msg)
+{
+    var messageContent = "";
+    messageContent = msg.content;
+    messageContent.replace("/autism", "");
+
+    for(i = 0; i < messageContent.length; i++)
+    {
+        if(Math.random() < 0.3)
+        {
+            messageContent.charAt(i) = messageContent.charAt(i).toUpperCase();
+        }
+    }
+    msg.edit(messageContent);
+}
+
 
 //If you get a message
 client.on('message', msg => {
     //If the message author is not this bot
     if(msg.author.tag != client.user.tag)
     {
+        if(msg.content.includes("/autism"))
+        {
+            if(msg.content.startsWith("/autism"))
+            {
+                editMessageAutism(msg);
+                msg.edit
+            }
+        }
         if(msg.content === 'ping')
         {
             msg.reply('pong');
