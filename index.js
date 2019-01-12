@@ -3,10 +3,12 @@ const client = new Discord.Client();
 const config = require('./config.js');
 var LocalStorage = require('node-localstorage').LocalStorage,
 localStorage = new LocalStorage('./scratch');
+
 //428950203144470528 General
 //521434157193232392 Bot Testing
 
 
+//Change this to your channel ID this is mine and I want it
 var messageChannel = '521434157193232392';
 
 
