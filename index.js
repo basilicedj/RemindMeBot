@@ -15,7 +15,6 @@ client.on('ready', () => {
  console.log(`Logged in as ${client.user.tag}!`);
  });
 
-console.log(config.getLogon());
 client.login(config.getLogon());
 
 //Start the bot
@@ -185,17 +184,6 @@ function findDateTimestamp(incomingString)
     date = new Date(date);
     console.log(date.getTime());
     return date.getTime();
-}
-
-function storeData(timestamp, username, userID, text)
-{
-	var dates = config.database.child("reminders");
-	dates.push({
-	"info" : text,
-	"timestamp" : timestamp,
-	"username" : username,
-	"userID": userID
-	})
 }
 
 function findTimestamp(incomingStr)
