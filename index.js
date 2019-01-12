@@ -7,7 +7,7 @@ localStorage = new LocalStorage('./scratch');
 //521434157193232392 Bot Testing
 
 
-var messageChannel = '428950203144470528';
+var messageChannel = '521434157193232392';
 
 
 
@@ -43,7 +43,8 @@ client.login(config.getLogon());
 //Check the time for each entry in storage
 function checkTimes() {
     var i;
-    for(i = 0; i < localStorage.length; i++)
+    
+	for(i = 0; i < localStorage.length; i++)
     {
         var inStorage = localStorage.getItem(localStorage.key(i));
         if(inStorage != null)
@@ -62,22 +63,32 @@ function checkTimes() {
             }
         }
     }
+	
 }
 
-function editMessageAutism(msg)
+function editMessageAutism(mesg)
 {
     var messageContent = "";
-    messageContent = msg.content;
-    messageContent.replace("/autism", "");
+    messageContent = mesg.content;
+    var newMessage = "";
 
-    for(i = 0; i < messageContent.length; i++)
+    for(i = 7; i < messageContent.length; i++)
     {
-        if(Math.random() < 0.3)
+	var math = Math.random();
+        console.log(math);
+	if(math < 0.5)
         {
-            messageContent.charAt(i) = messageContent.charAt(i).toUpperCase();
+            newMessage = newMessage + messageContent[i].toUpperCase();
         }
+		else
+		{
+			newMessage = newMessage + messageContent[i];
+		}
     }
-    msg.edit(messageContent);
+    mesg.channel.send(newMessage);
+    mesg.delete()
+  	.then(msg => console.log(`Deleted message from ${msg.author.username}`))
+  	.catch(console.error);
 }
 
 
@@ -114,19 +125,19 @@ client.on('message', msg => {
             }
             else if (incomingMessage.includes("remove reminder ")) {
                 var respond = removeReminder(incomingMessage);
-                msg.reply(respond);
+                //msg.reply(respond);
             }
-            else if (incomingMessage === "clear reminders secret lock hasssssha") {
+            else if (incomingMessage === "clear reders secret lock hasssssha") {
                 var respond = clearReminders();
-                msg.reply(respond);
+                //msg.reply(respond);
             }
             else if (incomingMessage.includes("remind me:")) {
                 var respond = remindMeStart(msg.content, msg.author.id, attachment, msg.author.username);
-                msg.reply(respond);
+                //msg.reply(respond);
             }
             else if(incomingMessage.includes("remind")) {
                    var respond = remindFriendStart(msg.content, msg.mentions.users, attachment, msg.author.username);
-                   msg.reply(respond);
+                   //msg.reply(respond);
             }
         }
     }
